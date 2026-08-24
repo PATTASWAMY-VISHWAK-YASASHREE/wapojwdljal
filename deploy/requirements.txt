@@ -2,4 +2,6 @@ fastapi==0.115.0
 uvicorn[standard]==0.32.0
 websockets==13.1
 httpx==0.27.2
-audioop
+numpy==2.1.3
+faster-whisper==1.0.3
+audioop-lts==0.2.1; python_version >= "3.13"
