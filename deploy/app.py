@@ -1,12 +1,4 @@
-=== INSTRUCTIONS ===
-1. GitHub repo -> app.py -> pencil icon -> replace ALL content with below
-2. Commit -> wait ~2 min for Render redeploy
-3. Then make a call and pick up
-4. After it disconnects, open:
-   https://wapojwdljal.onrender.com/debug/events
-   Paste me EVERYTHING on that page - it tells us exactly where Twilio fails.
 
-=== PASTE FROM HERE ===
 """ElevateBox voice agent — complete, self-contained, Render-ready.
 
 Twilio flow:
