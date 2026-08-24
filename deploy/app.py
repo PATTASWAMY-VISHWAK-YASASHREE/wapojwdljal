@@ -61,10 +61,16 @@ async def answer(request: FastAPIRequest):
     except Exception:
         params = dict(request.query_params)
     call_sid = params.get("CallSid", "unknown")
-    host = PUBLIC_BASE_URL.replace("https://", "wss://").replace("http://", "ws://")
+    # Derive the public host from the incoming request headers - works with
+    # zero configuration on Render (they set Host + X-Forwarded-Proto).
+    host_hdr = request.headers.get("host", "")
+    proto = request.headers.get("x-forwarded-proto", "https")
+    wss = f"wss://{host_hdr}" if host_hdr else PUBLIC_BASE_URL.replace(
+        "https://", "wss://").replace("http://", "ws://")
     twiml = ('<?xml version="1.0" encoding="UTF-8"?><Response>'
-             f'<Connect><Stream url="{host}/media/{call_sid}" /></Connect>'
-             '</Response>')
+             '<Start><Stream name="inbound-audio" '
+             f'url="{wss}/media/{call_sid}" track="inbound_track" />'
+             '</Start><Pause length="60"/></Response>')
     connected_events.setdefault(call_sid, asyncio.Event())
     return Response(twiml, media_type="application/xml")
 
