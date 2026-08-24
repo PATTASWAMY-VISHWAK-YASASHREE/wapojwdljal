@@ -1,3 +1,12 @@
+=== INSTRUCTIONS ===
+1. GitHub repo -> app.py -> pencil icon -> replace ALL content with below
+2. Commit -> wait ~2 min for Render redeploy
+3. Then make a call and pick up
+4. After it disconnects, open:
+   https://wapojwdljal.onrender.com/debug/events
+   Paste me EVERYTHING on that page - it tells us exactly where Twilio fails.
+
+=== PASTE FROM HERE ===
 """ElevateBox voice agent — complete, self-contained, Render-ready.
 
 Twilio flow:
@@ -42,6 +51,19 @@ SYSTEM_PROMPT = (
     "the details right now.")
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+# ---- persistent event log (ground truth for debugging) ----
+import time as _time
+EVENTS: list[str] = []
+def _log(msg: str):
+    line = f"{_time.strftime('%H:%M:%S')} {msg}"
+    EVENTS.append(line)
+    print(line, flush=True)
+
+@app.get("/debug/events")
+async def debug_events():
+    return {"events": EVENTS[-50:]}
+
 
 
 # ------------------------------ helpers -------------------------------------
@@ -160,6 +182,7 @@ async def answer(request: Request):
     if not params:
         params = dict(request.query_params)
     call_sid = params.get("CallSid", "unknown")
+    _log(f"[answer] fetched by Twilio CallSid={call_sid}")
 
     # derive absolute wss from Host header (zero-config on Render)
     host_hdr = request.headers.get("host", "")
@@ -191,5 +214,6 @@ async def trigger_call(body: CallRequest):
     with urllib.request.urlopen(req, timeout=15) as r:
         result = json.loads(r.read())
     return {"status": result.get("status"), "call_uuid": result.get("sid")}
+
 
 
